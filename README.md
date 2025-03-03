@@ -11,15 +11,15 @@ The robot autonomously navigates a Gazebo-simulated environment, avoiding obstac
 ## Screenshots
 
 ### Gazebo Simulation
-![Gazebo Simulation](animation.png)  
+![Gazebo Simulation](images/animation.png)  
 *The TurtleBot3 navigating a hexagonal obstacle course with LIDAR data visualized.*
 
 ### Velocity Commands (/cmd_vel)
-![/cmd_vel Output](cmd_vel.png)  
+![/cmd_vel Output](images/cmd_vel.png)  
 *Sample output from `ros2 topic echo /cmd_vel`, showing velocity commands (e.g., `angular.z: 0.5` for turning).*
 
 ### Obstacle Avoidance Logs
-![Obstacle Avoidance Logs](logs.png)  
+![Obstacle Avoidance Logs](images/logs.png)  
 *Terminal logs demonstrating real-time obstacle detection and movement adjustments.*
 
 ---
