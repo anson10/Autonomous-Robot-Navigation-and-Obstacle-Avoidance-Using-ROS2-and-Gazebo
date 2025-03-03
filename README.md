@@ -1,5 +1,4 @@
-# Obstacle Avoidance Robot with ROS2 and Gazebo
-
+# Autonomous-Robot-Navigation-and-Obstacle-Avoidance-Using-ROS2-and-Gazebo
 This repository contains the implementation of an autonomous navigation and obstacle avoidance robot simulated using ROS2 (Humble) and Gazebo. The project features a TurtleBot3 Burger robot navigating a custom hexagonal obstacle course, utilizing LIDAR data for real-time obstacle detection and avoidance. 
 
 ---
