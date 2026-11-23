@@ -2,14 +2,25 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>my_robot_navigation</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <version>1.1.0</version>
+  <description>Autonomous multi-strategy obstacle avoidance robot in Gazebo with ROS2 Humble.</description>
   <maintainer email="sansonmsa@gmail.com">anson</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
-  <depend>rclcpp</depend>
-  <depend>sensor_msgs</depend>
-  <depend>geometry_msgs</depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>rcl_interfaces</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>turtlebot3_gazebo</exec_depend>
+  <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -1,0 +1,43 @@
+obstacle_avoidance_node:
+  ros__parameters:
+    use_sim_time: true
+
+    # Topics and frames (topics are read-only after start-up)
+    scan_topic: "/scan"
+    cmd_vel_topic: "/cmd_vel"
+    odom_topic: "/odom"
+    goal_topic: "/goal_pose"      # RViz "2D Goal Pose" tool publishes here
+    odom_frame: "odom"
+
+    # Avoidance algorithm: "sector" | "apf" | "follow_the_gap"
+    algorithm: "sector"
+
+    # Distance thresholds (m)
+    safe_distance: 0.65
+    critical_distance: 0.30
+    robot_radius: 0.14            # used by follow_the_gap safety bubbles
+
+    # Velocity limits
+    max_linear_speed: 0.22        # TurtleBot3 Burger hardware limit
+    min_linear_speed: 0.05
+    recovery_linear_speed: -0.10
+    max_angular_speed: 1.20
+
+    # Algorithm tuning
+    front_fov_deg: 120.0
+    apf_attractive_gain: 1.0
+    apf_repulsive_gain: 0.25
+    apf_influence_distance: 1.20
+    gap_threshold_distance: 0.80
+    stuck_timeout_steps: 25       # scans below critical distance before RECOVERY
+    trap_timeout_steps: 35        # scans without goal progress before WALL_FOLLOW
+
+    # Goal navigation. Empty waypoints = free exploration until a goal arrives.
+    # Format: "x1,y1; x2,y2; ..." in the odom frame (equals Gazebo world coordinates).
+    waypoints: ""
+    loop_waypoints: false
+    goal_tolerance: 0.22
+
+    # Safety and visualisation
+    scan_timeout_s: 0.5           # stop the robot if LiDAR goes silent this long
+    publish_markers: true

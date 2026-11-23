@@ -1,0 +1,99 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="obstacle_arena">
+    <!-- Ground and light are defined inline (no model:// includes), so the world
+         loads without GAZEBO_MODEL_PATH or the online model database. -->
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <surface><friction><ode><mu>100</mu><mu2>50</mu2></ode></friction></surface>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material><ambient>0.35 0.37 0.40 1</ambient><diffuse>0.35 0.37 0.40 1</diffuse></material>
+        </visual>
+      </link>
+    </model>
+
+    <physics type="ode">
+      <real_time_update_rate>1000.0</real_time_update_rate>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+    </physics>
+
+    <!-- Outer boundary walls (6m x 6m arena) -->
+    <model name="arena_walls">
+      <static>true</static>
+      <link name="north_wall">
+        <pose>0 3.0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>6.15 0.15 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>6.15 0.15 0.5</size></box></geometry><material><ambient>0.30 0.34 0.42 1</ambient><diffuse>0.30 0.34 0.42 1</diffuse></material></visual>
+      </link>
+      <link name="south_wall">
+        <pose>0 -3.0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>6.15 0.15 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>6.15 0.15 0.5</size></box></geometry><material><ambient>0.30 0.34 0.42 1</ambient><diffuse>0.30 0.34 0.42 1</diffuse></material></visual>
+      </link>
+      <link name="east_wall">
+        <pose>3.0 0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>0.15 6.0 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.15 6.0 0.5</size></box></geometry><material><ambient>0.30 0.34 0.42 1</ambient><diffuse>0.30 0.34 0.42 1</diffuse></material></visual>
+      </link>
+      <link name="west_wall">
+        <pose>-3.0 0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><box><size>0.15 6.0 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.15 6.0 0.5</size></box></geometry><material><ambient>0.30 0.34 0.42 1</ambient><diffuse>0.30 0.34 0.42 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Hexagonal cylindrical pillars -->
+    <model name="obstacles">
+      <static>true</static>
+      <link name="pillar_1">
+        <pose>1.2 0.0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_2">
+        <pose>-1.2 0.0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_3">
+        <pose>0.6 1.1 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_4">
+        <pose>-0.6 1.1 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_5">
+        <pose>0.6 -1.1 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_6">
+        <pose>-0.6 -1.1 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.22</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+      <link name="pillar_7">
+        <pose>0.0 0.0 0.25 0 0 0</pose>
+        <collision name="collision"><geometry><cylinder><radius>0.20</radius><length>0.5</length></cylinder></geometry></collision>
+        <visual name="visual"><geometry><cylinder><radius>0.20</radius><length>0.5</length></cylinder></geometry><material><ambient>0.75 0.31 0.27 1</ambient><diffuse>0.75 0.31 0.27 1</diffuse></material></visual>
+      </link>
+    </model>
+  </world>
+</sdf>
