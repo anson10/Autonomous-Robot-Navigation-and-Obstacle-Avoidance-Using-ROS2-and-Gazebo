@@ -1,0 +1,22 @@
+# ROS2 / Colcon build artifacts
+build/
+install/
+log/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Raw Gazebo run recordings (regenerate with scripts/gazebo_tour.sh)
+results/gazebo/

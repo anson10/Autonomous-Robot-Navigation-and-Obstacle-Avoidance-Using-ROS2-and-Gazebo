@@ -1,3 +1,0 @@
-[console_scripts]
-obstacle_avoidance = my_robot_navigation.obstacle_avoidance:main
-
