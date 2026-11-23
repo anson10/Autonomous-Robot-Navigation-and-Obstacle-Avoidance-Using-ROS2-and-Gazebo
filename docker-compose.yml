@@ -1,0 +1,16 @@
+services:
+  robot_navigation:
+    build: .
+    container_name: ros2_obstacle_avoidance
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - TURTLEBOT3_MODEL=burger
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ./src:/ros2_ws/src
+    command: >
+      bash -c "source /opt/ros/humble/setup.bash &&
+               source /ros2_ws/install/setup.bash &&
+               ros2 launch my_robot_navigation robot_navigation.launch.py use_rviz:=true"

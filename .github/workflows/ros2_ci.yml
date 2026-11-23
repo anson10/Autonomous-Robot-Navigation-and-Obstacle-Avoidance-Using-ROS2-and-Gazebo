@@ -1,0 +1,56 @@
+name: ROS2 Humble CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    container:
+      image: ros:humble-ros-base
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            python3-pytest \
+            python3-flake8 \
+            ros-humble-ament-flake8 \
+            ros-humble-ament-pep257 \
+            ros-humble-ament-copyright \
+            ros-humble-sensor-msgs \
+            ros-humble-geometry-msgs \
+            ros-humble-visualization-msgs \
+            ros-humble-nav-msgs \
+            ros-humble-std-srvs
+
+      - name: Build ROS2 package with colcon
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build --packages-select my_robot_navigation --event-handlers console_direct+
+
+      - name: Run unit and linter tests
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
+          colcon test --packages-select my_robot_navigation --event-handlers console_direct+
+          colcon test-result --verbose
+
+      - name: Benchmark the planners (2D simulator)
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
+          {
+            echo '## Planner benchmark (10 seeded scenarios, 2D simulator)'
+            echo
+            ros2 run my_robot_navigation benchmark --trials 10 --seed 7
+          } >> "$GITHUB_STEP_SUMMARY"
