@@ -193,6 +193,18 @@ xhost +local:docker
 docker compose up --build          # Gazebo + RViz, C++ node, sector planner, free exploration
 ```
 
+Or with waypoints and a chosen planner:
+
+```bash
+docker build -t obstacle-avoidance .
+docker run --rm -it --network host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
+  obstacle-avoidance bash -c "source /ros2_ws/install/setup.bash && \
+  ros2 launch my_robot_navigation robot_navigation.launch.py use_rviz:=true impl:=cpp \
+  algorithm:=apf waypoints:='-1.8,1.8; 1.8,1.8; 1.8,-1.8; -1.8,-1.8' loop_waypoints:=true"
+```
+
+If the Gazebo window stays black (common under WSL), add `-e LIBGL_ALWAYS_SOFTWARE=1`.
+
 ### Native (Ubuntu 22.04 + ROS 2 Humble)
 
 ```bash
@@ -202,7 +214,19 @@ cd Autonomous-Robot-Navigation-and-Obstacle-Avoidance-Using-ROS2-and-Gazebo
 source /opt/ros/humble/setup.bash
 rosdep install --from-paths src --ignore-src -y     # C++ build deps (pybind11, gtest, ...)
 colcon build --symlink-install && source install/setup.bash
-ros2 launch my_robot_navigation robot_navigation.launch.py use_rviz:=true
+
+# Gazebo + RViz with the C++ node (impl:=cpp is the default)
+ros2 launch my_robot_navigation robot_navigation.launch.py use_rviz:=true impl:=cpp
+```
+
+The log should show `Obstacle avoidance node (C++) started`, and the RViz label above the
+robot ends in `C++`, e.g. `CLEAR [sector, C++]`. Use `impl:=python` for the Python node.
+
+To run only the C++ node against an already running Gazebo simulation:
+
+```bash
+ros2 run my_robot_navigation_cpp obstacle_avoidance_node --ros-args \
+  --params-file src/my_robot_navigation/config/navigation_params.yaml -p algorithm:=apf
 ```
 
 ---
