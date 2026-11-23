@@ -27,22 +27,25 @@ jobs:
             ros-humble-ament-flake8 \
             ros-humble-ament-pep257 \
             ros-humble-ament-copyright \
+            ros-humble-ament-lint-common \
+            ros-humble-ament-cmake-gtest \
+            ros-humble-ament-cmake-pytest \
             ros-humble-sensor-msgs \
             ros-humble-geometry-msgs \
             ros-humble-visualization-msgs \
             ros-humble-nav-msgs \
             ros-humble-std-srvs
 
-      - name: Build ROS2 package with colcon
+      - name: Build both packages (Python and C++) with colcon
         run: |
           source /opt/ros/humble/setup.bash
-          colcon build --packages-select my_robot_navigation --event-handlers console_direct+
+          colcon build --event-handlers console_cohesion+
 
-      - name: Run unit and linter tests
+      - name: Run unit, parity and linter tests
         run: |
           source /opt/ros/humble/setup.bash
           source install/setup.bash
-          colcon test --packages-select my_robot_navigation --event-handlers console_direct+
+          colcon test --event-handlers console_direct+
           colcon test-result --verbose
 
       - name: Benchmark the planners (2D simulator)
@@ -50,7 +53,10 @@ jobs:
           source /opt/ros/humble/setup.bash
           source install/setup.bash
           {
-            echo '## Planner benchmark (10 seeded scenarios, 2D simulator)'
-            echo
-            ros2 run my_robot_navigation benchmark --trials 10 --seed 7
+            for impl in python cpp; do
+              echo "## Planner benchmark: ${impl} implementation (10 seeded scenarios, 2D simulator)"
+              echo
+              ros2 run my_robot_navigation benchmark --trials 10 --seed 7 --impl "${impl}" --jobs 2
+              echo
+            done
           } >> "$GITHUB_STEP_SUMMARY"

@@ -22,7 +22,7 @@ import statistics
 import sys
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from my_robot_navigation.avoidance_planner import PlannerConfig
+from my_robot_navigation.avoidance_planner import AvoidancePlanner, PlannerConfig
 from my_robot_navigation.sim2d import (
     Arena,
     EpisodeResult,
@@ -110,11 +110,19 @@ def format_markdown(summaries: Dict[str, Dict[str, float]]) -> str:
     return '\n'.join(lines)
 
 
-def _run_one(job: Tuple[str, Dict, float]) -> EpisodeResult:
-    algo, sc, timeout = job
+def planner_class(impl: str):
+    """Return the planner class for 'python' or 'cpp' (needs my_robot_navigation_cpp)."""
+    if impl == 'cpp':
+        from my_robot_navigation_cpp import CppAvoidancePlanner
+        return CppAvoidancePlanner
+    return AvoidancePlanner
+
+
+def _run_one(job: Tuple[str, Dict, float, str]) -> EpisodeResult:
+    algo, sc, timeout, impl = job
     return run_episode(
         sc['arena'], PlannerConfig(algorithm=algo), sc['start'], sc['goal'],
-        timeout_s=timeout,
+        timeout_s=timeout, planner_cls=planner_class(impl),
     )
 
 
@@ -136,6 +144,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument(
         '--jobs', type=int, default=1, help='parallel worker processes'
     )
+    parser.add_argument(
+        '--impl', choices=['python', 'cpp'], default='python',
+        help='planner implementation to benchmark',
+    )
     args = parser.parse_args(argv)
 
     world = args.world or default_world_path()
@@ -146,7 +158,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     rows = []
     summaries: Dict[str, Dict[str, float]] = {}
-    jobs = [(a, sc, args.timeout) for a in args.algorithms for sc in scenarios]
+    planner_class(args.impl)  # fail early if the C++ module is missing
+    jobs = [(a, sc, args.timeout, args.impl) for a in args.algorithms for sc in scenarios]
     if args.jobs > 1:
         with ProcessPoolExecutor(args.jobs) as pool:
             all_results = list(pool.map(_run_one, jobs, chunksize=4))
@@ -176,7 +189,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             writer.writerows(rows)
 
     print(
-        f'world={world.name} trials={args.trials} seed={args.seed} '
+        f'impl={args.impl} world={world.name} trials={args.trials} seed={args.seed} '
         f'clutter={args.clutter} min_dist={args.min_dist}m '
         f'timeout={args.timeout}s'
     )
