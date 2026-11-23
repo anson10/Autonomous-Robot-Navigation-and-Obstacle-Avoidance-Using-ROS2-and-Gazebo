@@ -200,6 +200,7 @@ sudo apt install ros-humble-turtlebot3 ros-humble-turtlebot3-gazebo python3-colc
 git clone https://github.com/anson10/Autonomous-Robot-Navigation-and-Obstacle-Avoidance-Using-ROS2-and-Gazebo.git
 cd Autonomous-Robot-Navigation-and-Obstacle-Avoidance-Using-ROS2-and-Gazebo
 source /opt/ros/humble/setup.bash
+rosdep install --from-paths src --ignore-src -y     # C++ build deps (pybind11, gtest, ...)
 colcon build --symlink-install && source install/setup.bash
 ros2 launch my_robot_navigation robot_navigation.launch.py use_rviz:=true
 ```
