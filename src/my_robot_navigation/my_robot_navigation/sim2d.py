@@ -188,9 +188,14 @@ def run_episode(
     timeout_s: float = 90.0,
     robot_radius: float = BURGER_RADIUS,
     record: bool = False,
+    planner_cls=AvoidancePlanner,
 ) -> EpisodeResult:
-    """Drive the planner from start pose to goal; stop on success, collision or timeout."""
-    planner = AvoidancePlanner(config)
+    """
+    Drive the planner from start pose to goal; stop on success, collision or timeout.
+
+    planner_cls lets the benchmark swap in the C++ planner (CppAvoidancePlanner).
+    """
+    planner = planner_cls(config)
     x, y, yaw = start
     gx, gy = goal
     straight = math.hypot(gx - x, gy - y)

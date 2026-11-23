@@ -47,42 +47,54 @@ def analyse(run_dir: Path, arena):
 
 def main() -> None:
     arena = load_world(str(ROOT / 'src/my_robot_navigation/worlds/obstacle_arena.world'))
-    order = ['sector', 'apf', 'follow_the_gap']
-    dirs = [d for d in (ROOT / 'results/gazebo').iterdir() if (d / 'odom.csv').exists()]
-    dirs.sort(key=lambda d: order.index(d.name) if d.name in order else len(order))
-    runs = {d.name: analyse(d, arena) for d in dirs}
-    fig, axes = plt.subplots(1, len(runs), figsize=(5.2 * len(runs), 5.4), facecolor='white')
-    axes = [axes] if len(runs) == 1 else axes
-    for ax, (name, r) in zip(axes, runs.items()):
-        for b in arena.boxes:
-            ax.add_patch(patches.Rectangle((b.xmin, b.ymin), b.xmax - b.xmin, b.ymax - b.ymin,
-                                           color='#4c566a'))
-        for c in arena.circles:
-            ax.add_patch(patches.Circle((c.x, c.y), c.r, color='#be5046'))
-        xs, ys = [p[1] for p in r['path']], [p[2] for p in r['path']]
-        ax.plot(xs, ys, color=COLORS.get(name, 'k'), lw=2)
-        ax.plot(xs[0], ys[0], 'o', color='black', ms=6)
-        for i, (wx, wy) in enumerate(WAYPOINTS, 1):
-            ax.plot(wx, wy, '*', color='#d19a66', ms=11, markeredgecolor='black')
-            ax.annotate(str(i), (wx, wy), xytext=(4, 4), textcoords='offset points', fontsize=8)
-        t = f"{r['time']:.0f} s" if r['time'] is not None else 'not finished'
-        ax.set_title(f"{name}: {r['reached']}/8 goals, {t}", fontsize=11)
-        ax.set_aspect('equal')
-        ax.set_xlim(-3.15, 3.15)
-        ax.set_ylim(-3.15, 3.15)
-        ax.grid(alpha=0.3)
+    algos = ['sector', 'apf', 'follow_the_gap']
+    impls = [i for i in ('cpp', 'python') if (ROOT / 'results/gazebo' / i).is_dir()]
+    runs = {
+        (impl, algo): analyse(ROOT / 'results/gazebo' / impl / algo, arena)
+        for impl in impls for algo in algos
+        if (ROOT / 'results/gazebo' / impl / algo / 'odom.csv').exists()
+    }
+    fig, axes = plt.subplots(len(impls), len(algos), figsize=(5.0 * len(algos),
+                             5.1 * len(impls)), facecolor='white', squeeze=False)
+    labels = {'cpp': 'C++ node', 'python': 'Python node'}
+    for row, impl in enumerate(impls):
+        for col, algo in enumerate(algos):
+            ax = axes[row][col]
+            ax.set_aspect('equal')
+            ax.set_xlim(-3.15, 3.15)
+            ax.set_ylim(-3.15, 3.15)
+            ax.grid(alpha=0.3)
+            for b in arena.boxes:
+                ax.add_patch(patches.Rectangle((b.xmin, b.ymin), b.xmax - b.xmin,
+                                               b.ymax - b.ymin, color='#4c566a'))
+            for c in arena.circles:
+                ax.add_patch(patches.Circle((c.x, c.y), c.r, color='#be5046'))
+            for i, (wx, wy) in enumerate(WAYPOINTS, 1):
+                ax.plot(wx, wy, '*', color='#d19a66', ms=11, markeredgecolor='black')
+                ax.annotate(str(i), (wx, wy), xytext=(4, 4), textcoords='offset points',
+                            fontsize=8)
+            r = runs.get((impl, algo))
+            if r is None:
+                ax.set_title(f'{labels[impl]}, {algo}: no data', fontsize=11)
+                continue
+            xs, ys = [p[1] for p in r['path']], [p[2] for p in r['path']]
+            ax.plot(xs, ys, color=COLORS.get(algo, 'k'), lw=2)
+            ax.plot(xs[0], ys[0], 'o', color='black', ms=6)
+            t = f"{r['time']:.0f} s" if r['time'] is not None else 'not finished'
+            ax.set_title(f"{labels[impl]}, {algo}: {r['reached']}/8 goals, {t}", fontsize=11)
     fig.suptitle('Gazebo (TurtleBot3 Burger): 8-waypoint tour, trajectories from /odom',
-                 fontsize=12)
+                 fontsize=13)
     fig.tight_layout()
     out = ROOT / 'images' / 'gazebo_tour.png'
-    fig.savefig(out, dpi=110)
+    fig.savefig(out, dpi=100)
     print(f'Saved {out}\n')
-    print('| Algorithm | Goals reached | Tour time (sim s) | Distance driven (m) '
+    print('| Node | Planner | Goals reached | Tour time (sim s) | Distance driven (m) '
           '| Min clearance (m) |')
-    print('| :--- | ---: | ---: | ---: | ---: |')
-    for name, r in runs.items():
+    print('| :--- | :--- | ---: | ---: | ---: | ---: |')
+    for (impl, algo), r in runs.items():
         t = f"{r['time']:.0f}" if r['time'] is not None else '-'
-        print(f"| `{name}` | {r['reached']}/8 | {t} | {r['dist']:.1f} | {r['clear']:.2f} |")
+        print(f"| {labels[impl]} | `{algo}` | {r['reached']}/8 | {t} | {r['dist']:.1f} "
+              f"| {r['clear']:.2f} |")
 
 
 if __name__ == '__main__':

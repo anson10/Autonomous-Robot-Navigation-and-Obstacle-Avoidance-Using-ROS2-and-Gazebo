@@ -96,10 +96,14 @@ def _setup(context, *_args, **_kwargs):
         if arg(name) != '':
             overrides[name] = arg(name) if name == 'waypoints' else _typed(arg(name))
 
+    if arg('impl') == 'cpp':
+        package, executable = 'my_robot_navigation_cpp', 'obstacle_avoidance_node'
+    else:
+        package, executable = 'my_robot_navigation', 'obstacle_avoidance'
     actions.append(
         Node(
-            package='my_robot_navigation',
-            executable='obstacle_avoidance',
+            package=package,
+            executable=executable,
             name='obstacle_avoidance_node',
             output='screen',
             parameters=[arg('params_file'), overrides],
@@ -131,6 +135,10 @@ def generate_launch_description() -> LaunchDescription:
         ),
         DeclareLaunchArgument('x_pose', default_value='', description='Spawn x (m)'),
         DeclareLaunchArgument('y_pose', default_value='', description='Spawn y (m)'),
+        DeclareLaunchArgument(
+            'impl', default_value='cpp',
+            description='Navigation node implementation: cpp (rclcpp) or python (rclpy)',
+        ),
         DeclareLaunchArgument('use_gazebo', default_value='true'),
         DeclareLaunchArgument(
             'gui', default_value='true', description='Start the Gazebo client window'
